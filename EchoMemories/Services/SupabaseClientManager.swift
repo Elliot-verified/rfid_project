@@ -39,4 +39,13 @@ enum SupabaseClientManager {
     }
 
     static var isConfigured: Bool { client != nil }
+
+    /// Public object URL for Storage (bucket must be public or use signed URLs elsewhere).
+    static func publicStorageObjectURL(bucket: String, objectPath: String) -> URL? {
+        guard let urlString = Bundle.main.object(forInfoDictionaryKey: "SUPABASE_URL") as? String,
+              !urlString.isEmpty else { return nil }
+        let base = urlString.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+        let encodedPath = objectPath.split(separator: "/").map { $0.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? String($0) }.joined(separator: "/")
+        return URL(string: "\(base)/storage/v1/object/public/\(bucket)/\(encodedPath)")
+    }
 }

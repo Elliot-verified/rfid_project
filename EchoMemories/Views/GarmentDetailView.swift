@@ -132,14 +132,35 @@ struct EntryRowView: View {
         return f
     }()
 
+    private var photoURL: URL? {
+        guard let path = entry.photoStoragePath else { return nil }
+        return SupabaseClientManager.publicStorageObjectURL(bucket: EntryPhotoUpload.bucket, objectPath: path)
+    }
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(Self.dateFormatter.string(from: entry.wornDate))
-                .font(.subheadline)
-                .fontWeight(.medium)
-                .foregroundStyle(.secondary)
-            Text(entry.content)
-                .font(.body)
+        HStack(alignment: .top, spacing: 12) {
+            if let url = photoURL {
+                AsyncImage(url: url) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .scaledToFill()
+                    default:
+                        Color.gray.opacity(0.15)
+                    }
+                }
+                .frame(width: 56, height: 56)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+            }
+            VStack(alignment: .leading, spacing: 4) {
+                Text(Self.dateFormatter.string(from: entry.wornDate))
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    .foregroundStyle(.secondary)
+                Text(entry.content)
+                    .font(.body)
+            }
         }
         .padding(.vertical, 4)
     }

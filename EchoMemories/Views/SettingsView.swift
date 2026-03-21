@@ -50,6 +50,9 @@ struct SettingsView: View {
                             .font(.footnote)
                             .foregroundStyle(.red)
                     }
+                    Text("Public NFC links use PUBLIC_SHARE_BASE_URL in Info.plist and the hosted share.html page. See README.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
                 } header: {
                     Text("Sync")
                 }

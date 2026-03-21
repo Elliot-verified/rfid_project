@@ -66,6 +66,8 @@ Each new build requires a new Archive and Upload, then processing and review.
 - **Tap a tag**: With the app in the background or closed, tap the tag. iOS shows a notification; tap it to open the app to that garment’s journal.
 - **Add a memory**: On a garment’s screen, tap “Add memory”, choose the date you wore it, and write your entry.
 - **Settings**: Sign in with Apple and sync when Supabase is configured (see below).
+- **Photos**: Optional image per memory (requires sign-in and Supabase).
+- **Public sharing**: Edit a garment to mark it public, host `web/share.html`, set `PUBLIC_SHARE_BASE_URL`, sync, then rewrite the NFC tag (see README Supabase section).
 
 ## Optional: Supabase sync
 
@@ -73,23 +75,41 @@ To back up and sync data across devices:
 
 1. Create a [Supabase](https://supabase.com) project.
 
-2. In the SQL Editor, run the schema and RLS from [supabase/schema.sql](supabase/schema.sql) (create tables and enable RLS).
+2. In the SQL Editor, run the schema and RLS from [supabase/schema.sql](supabase/schema.sql) (create tables, storage bucket, and RLS). If you created the project with an **older** schema (before public sharing / photos), also run [supabase/migration_public_share_and_photos.sql](supabase/migration_public_share_and_photos.sql) once (fix any “policy already exists” errors by dropping those policies first).
 
 3. In Supabase: **Auth → Providers → Apple**, enable Sign in with Apple and set your app’s Bundle ID and Key.
 
 4. In Xcode, add your project URL and anon key to **Info.plist**:
    - `SUPABASE_URL`: your project URL (e.g. `https://xxxx.supabase.co`)
    - `SUPABASE_ANON_KEY`: the anon/public key from Project Settings → API
+   - `PUBLIC_SHARE_BASE_URL` (optional): where you host [web/share.html](web/share.html), **no trailing slash** (e.g. `https://yourname.github.io/echo-memories`). Required only if you want **public** NFC links that open in a browser for anyone.
 
 5. In the app, open **Settings**, tap **Sign in with Apple**, then **Sync now**.
+
+### Public page (anyone can scan)
+
+1. Turn **Public memories page** on for a garment under **Edit garment**, then **Sync now** so `is_public` is stored in Supabase.
+2. Host `web/share.html` at the same origin as `PUBLIC_SHARE_BASE_URL` (e.g. upload `share.html` so it is served at `{PUBLIC_SHARE_BASE_URL}/share.html`). Edit the file and set `SUPABASE_URL` and `SUPABASE_ANON_KEY` in the script (same values as the app; RLS only exposes rows marked public).
+3. Tap **Write NFC tag with current link** on that garment. Public garments get an **HTTPS** URL on the tag so guests see the same memories in Safari; private garments keep the `echomemories://` app link.
+
+### Photos on memories
+
+After you sign in, **Add memory** / **Edit entry** lets you attach a photo. Images upload to the Supabase Storage bucket `entry-photos` and sync like other fields. The share page shows photos for public entries.
+
+**Privacy:** public garments and their entries are readable by anyone with the link; only enable **Public** for garments you are comfortable exposing.
 
 ## Project structure
 
 - `EchoMemories/` – app source
   - **Models**: `Garment`, `JournalEntry` (Codable, sync-friendly)
   - **Views**: garment list, garment detail, entry form, add garment, settings
-  - **Services**: `LocalStore` (JSON on device), `NFCService` (read/write NDEF URL), `SyncService` (Supabase), `AuthService` (Sign in with Apple), `AppState` (deep link)
+  - **Services**: `LocalStore` (JSON on device), `NFCService` (read/write NDEF URL), `SyncService` (Supabase), `AuthService` (Sign in with Apple), `AppState` (deep link), `EntryPhotoUpload` (Storage)
 
 ## NFC tag format
 
-Each tag stores a single NDEF URI record: `echomemories://garment/<uuid>`. That URL is written when you link a tag to a garment. Compatible with Timeskey NTAG215/216 and any writable NDEF tag. Tags programmed with the old `clothjournal://` scheme must be re-linked with the app to update the URL.
+Each tag stores a single NDEF URI record:
+
+- **Private (default):** `echomemories://garment/<uuid>` — opens the Echo Memories app.
+- **Public:** `https://…/share.html?id=<uuid>` — opens the hosted share page in a browser for anyone (configure `PUBLIC_SHARE_BASE_URL` and deploy [web/share.html](web/share.html)).
+
+Compatible with Timeskey NTAG215/216 and other writable NDEF tags. Tags programmed with the old `clothjournal://` scheme must be re-linked with the app to update the URL.

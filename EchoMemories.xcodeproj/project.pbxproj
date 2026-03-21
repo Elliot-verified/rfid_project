@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3C14E1E9F9E834EFAB8B5C6D /* EntryPhotoUpload.swift in Sources */ = {isa = PBXBuildFile; fileRef = B130ACA12817942657AB90BA /* EntryPhotoUpload.swift */; };
 		571F6BCE6070F5669E2DD8FA /* GarmentListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 118DF04CF7B4F71E765F5E32 /* GarmentListView.swift */; };
 		581102145FA1BAC595288BED /* NFCService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B58DD8A5DDFD96682E640289 /* NFCService.swift */; };
 		5D12EBE1B689111BD06FEA76 /* LocalStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F08F9ADBAEBA0EB374CD88F9 /* LocalStore.swift */; };
@@ -41,6 +42,7 @@
 		90B0EB24668FEF9C12B7B103 /* SyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncService.swift; sourceTree = "<group>"; };
 		93FE8952A4E52585E77A75C7 /* AddGarmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddGarmentView.swift; sourceTree = "<group>"; };
 		A39F3C9878E00118F4AEC26A /* SupabaseClientManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseClientManager.swift; sourceTree = "<group>"; };
+		B130ACA12817942657AB90BA /* EntryPhotoUpload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryPhotoUpload.swift; sourceTree = "<group>"; };
 		B58DD8A5DDFD96682E640289 /* NFCService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NFCService.swift; sourceTree = "<group>"; };
 		B799585758F25D66528DA2ED /* EntryFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryFormView.swift; sourceTree = "<group>"; };
 		C1F35779BC1AD15342A42FFF /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
@@ -104,6 +106,7 @@
 			children = (
 				C1F35779BC1AD15342A42FFF /* AppState.swift */,
 				14B074FC7479121BEEA759DA /* AuthService.swift */,
+				B130ACA12817942657AB90BA /* EntryPhotoUpload.swift */,
 				F08F9ADBAEBA0EB374CD88F9 /* LocalStore.swift */,
 				B58DD8A5DDFD96682E640289 /* NFCService.swift */,
 				A39F3C9878E00118F4AEC26A /* SupabaseClientManager.swift */,
@@ -212,6 +215,7 @@
 				AB62C2A0EC4246BFA1997751 /* EchoMemoriesApp.swift in Sources */,
 				F0D239B9D6F874C03CDCE7F3 /* EditGarmentView.swift in Sources */,
 				D858C988322DA5A399033BC6 /* EntryFormView.swift in Sources */,
+				3C14E1E9F9E834EFAB8B5C6D /* EntryPhotoUpload.swift in Sources */,
 				B091DD5FB0E7290596161D7E /* Garment.swift in Sources */,
 				C82D28BAC51028A62F7B99A3 /* GarmentDetailView.swift in Sources */,
 				571F6BCE6070F5669E2DD8FA /* GarmentListView.swift in Sources */,

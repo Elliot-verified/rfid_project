@@ -1,3 +1,4 @@
+import PhotosUI
 import SwiftUI
 
 struct EntryFormView: View {
@@ -11,6 +12,14 @@ struct EntryFormView: View {
     @State private var content: String = ""
     @State private var mood: String = ""
     @State private var isSaving = false
+    @State private var saveError: String?
+    @State private var photoPickerItem: PhotosPickerItem?
+    @State private var pendingImage: UIImage?
+    @State private var removeRemotePhoto = false
+
+    private var canUseCloudPhoto: Bool {
+        SupabaseClientManager.isConfigured && AuthService.shared.session != nil
+    }
 
     init(garmentId: UUID, initialWornDate: Date, existingEntry: JournalEntry? = nil, onDismiss: @escaping () -> Void) {
         self.garmentId = garmentId
@@ -31,6 +40,52 @@ struct EntryFormView: View {
                         .lineLimit(3...8)
                     TextField("Mood (optional)", text: $mood)
                 }
+                Section {
+                    if let pendingImage {
+                        Image(uiImage: pendingImage)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(maxHeight: 200)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                    } else if !removeRemotePhoto, let path = existingEntry?.photoStoragePath,
+                              let url = SupabaseClientManager.publicStorageObjectURL(bucket: EntryPhotoUpload.bucket, objectPath: path) {
+                        AsyncImage(url: url) { phase in
+                            switch phase {
+                            case .success(let image):
+                                image
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(maxHeight: 200)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                            case .failure:
+                                Text("Could not load photo")
+                                    .foregroundStyle(.secondary)
+                            case .empty:
+                                ProgressView()
+                            @unknown default:
+                                EmptyView()
+                            }
+                        }
+                    }
+                    if canUseCloudPhoto {
+                        PhotosPicker(selection: $photoPickerItem, matching: .images) {
+                            Label(pendingImage == nil && existingEntry?.photoStoragePath == nil ? "Add photo" : "Change photo", systemImage: "photo")
+                        }
+                        if pendingImage != nil || existingEntry?.photoStoragePath != nil {
+                            Button("Remove photo", role: .destructive) {
+                                pendingImage = nil
+                                photoPickerItem = nil
+                                removeRemotePhoto = true
+                            }
+                        }
+                    } else {
+                        Text("Sign in with Apple (Settings) to attach photos that sync to the cloud.")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+                } header: {
+                    Text("Photo")
+                }
             }
             .navigationTitle(existingEntry == nil ? "New entry" : "Edit entry")
             .navigationBarTitleDisplayMode(.inline)
@@ -42,7 +97,7 @@ struct EntryFormView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
-                        save()
+                        Task { await save() }
                     }
                     .disabled(content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSaving)
                 }
@@ -53,28 +108,86 @@ struct EntryFormView: View {
                     mood = e.mood ?? ""
                 }
             }
+            .onChange(of: photoPickerItem) { newItem in
+                Task {
+                    guard let newItem else { return }
+                    if let data = try? await newItem.loadTransferable(type: Data.self),
+                       let ui = UIImage(data: data) {
+                        await MainActor.run {
+                            pendingImage = ui
+                            removeRemotePhoto = false
+                        }
+                    }
+                }
+            }
+            .alert("Could not save photo", isPresented: .init(
+                get: { saveError != nil },
+                set: { if !$0 { saveError = nil } }
+            )) {
+                Button("OK", role: .cancel) { saveError = nil }
+            } message: {
+                Text(saveError ?? "")
+            }
         }
     }
 
-    private func save() {
-        isSaving = true
+    private func save() async {
         let trimmedContent = content.trimmingCharacters(in: .whitespacesAndNewlines)
-        if let existing = existingEntry {
-            var updated = existing
-            updated.wornDate = wornDate
-            updated.content = trimmedContent
-            updated.mood = mood.isEmpty ? nil : mood
-            store.updateEntry(updated)
-        } else {
-            let entry = JournalEntry(
-                garmentId: garmentId,
-                wornDate: wornDate,
-                content: trimmedContent,
-                mood: mood.isEmpty ? nil : mood
-            )
-            store.addEntry(entry)
+        guard !trimmedContent.isEmpty else { return }
+        await MainActor.run { isSaving = true }
+
+        let entryId = existingEntry?.id ?? UUID()
+        var photoPath = existingEntry?.photoStoragePath
+
+        if removeRemotePhoto, let old = existingEntry?.photoStoragePath,
+           let client = SupabaseClientManager.client {
+            try? await EntryPhotoUpload.deleteIfPresent(client: client, path: old)
+            photoPath = nil
         }
-        isSaving = false
-        onDismiss()
+
+        if let img = pendingImage,
+           let client = SupabaseClientManager.client,
+           let session = try? await client.auth.session {
+            let uid = session.user.id.uuidString
+            guard let data = EntryPhotoUpload.jpegData(from: img) else {
+                await MainActor.run {
+                    isSaving = false
+                    saveError = "Could not prepare image."
+                }
+                return
+            }
+            do {
+                photoPath = try await EntryPhotoUpload.upload(client: client, userId: uid, entryId: entryId, imageData: data)
+            } catch {
+                await MainActor.run {
+                    isSaving = false
+                    saveError = error.localizedDescription
+                }
+                return
+            }
+        }
+
+        await MainActor.run {
+            if let existing = existingEntry {
+                var updated = existing
+                updated.wornDate = wornDate
+                updated.content = trimmedContent
+                updated.mood = mood.isEmpty ? nil : mood
+                updated.photoStoragePath = photoPath
+                store.updateEntry(updated)
+            } else {
+                let entry = JournalEntry(
+                    id: entryId,
+                    garmentId: garmentId,
+                    wornDate: wornDate,
+                    content: trimmedContent,
+                    mood: mood.isEmpty ? nil : mood,
+                    photoStoragePath: photoPath
+                )
+                store.addEntry(entry)
+            }
+            isSaving = false
+            onDismiss()
+        }
     }
 }

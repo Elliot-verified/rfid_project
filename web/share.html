@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Echo Memories — Shared garment</title>
+  <style>
+    :root { font-family: system-ui, sans-serif; line-height: 1.5; color: #111; }
+    body { max-width: 40rem; margin: 0 auto; padding: 1.25rem; }
+    h1 { font-size: 1.35rem; margin-bottom: 0.25rem; }
+    .muted { color: #666; font-size: 0.9rem; }
+    .entry { border-top: 1px solid #e5e5e5; padding: 1rem 0; }
+    .entry img { max-width: 100%; border-radius: 8px; margin-top: 0.5rem; }
+    .err { color: #b00; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <div id="app">
+    <p class="muted">Loading…</p>
+  </div>
+  <script>
+    (function () {
+      // Replace with your project values before hosting (same as in the iOS app Info.plist).
+      var SUPABASE_URL = 'https://wgnwtffuzvldclktuptf.supabase.co';
+      var SUPABASE_ANON_KEY = 'sb_publishable_QuNvvd22ksglzW6aoPPR3w_a5BtZFce';
+
+      var root = document.getElementById('app');
+      var params = new URLSearchParams(window.location.search);
+      var id = params.get('id');
+
+      function show(html) {
+        root.innerHTML = html;
+      }
+
+      if (!id) {
+        show('<p class="err">Missing garment id. Scan a valid Echo Memories tag.</p>');
+        return;
+      }
+
+      if (SUPABASE_URL.indexOf('REPLACE') >= 0 || SUPABASE_ANON_KEY.indexOf('REPLACE') >= 0) {
+        show('<p class="err">This page is not configured. Set SUPABASE_URL and SUPABASE_ANON_KEY in share.html, then deploy to the URL you put in PUBLIC_SHARE_BASE_URL in the iOS app.</p>');
+        return;
+      }
+
+      var createClient = window.supabase && window.supabase.createClient;
+      if (!createClient) {
+        show('<p class="err">Could not load Supabase client script.</p>');
+        return;
+      }
+      var client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      client
+        .from('garments')
+        .select('id,name,is_public')
+        .eq('id', id)
+        .eq('is_public', true)
+        .maybeSingle()
+        .then(function (gRes) {
+          if (gRes.error) {
+            show('<p class="err">' + gRes.error.message + '</p>');
+            return;
+          }
+          var g = gRes.data;
+          if (!g) {
+            show('<p class="err">This garment is not shared or does not exist.</p>');
+            return;
+          }
+          return client
+            .from('journal_entries')
+            .select('id,worn_date,content,mood,photo_storage_path')
+            .eq('garment_id', id)
+            .order('worn_date', { ascending: false })
+            .then(function (eRes) {
+              if (eRes.error) {
+                show('<p class="err">' + eRes.error.message + '</p>');
+                return;
+              }
+              var entries = eRes.data || [];
+              var html = '<h1>' + escapeHtml(g.name) + '</h1>';
+              html += '<p class="muted">Shared via Echo Memories</p>';
+              if (entries.length === 0) {
+                html += '<p class="muted">No memories yet.</p>';
+              } else {
+                entries.forEach(function (e) {
+                  html += '<article class="entry">';
+                  html += '<strong>' + escapeHtml(e.worn_date || '') + '</strong>';
+                  if (e.mood) html += ' <span class="muted">· ' + escapeHtml(e.mood) + '</span>';
+                  html += '<p>' + escapeHtml(e.content || '') + '</p>';
+                  if (e.photo_storage_path) {
+                    var pathEnc = e.photo_storage_path
+                      .split('/')
+                      .map(function (seg) {
+                        return encodeURIComponent(seg);
+                      })
+                      .join('/');
+                    var src =
+                      SUPABASE_URL.replace(/\/$/, '') +
+                      '/storage/v1/object/public/entry-photos/' +
+                      pathEnc;
+                    html += '<img src="' + src + '" alt="" loading="lazy" />';
+                  }
+                  html += '</article>';
+                });
+              }
+              show(html);
+            });
+        });
+    })();
+
+    function escapeHtml(s) {
+      if (!s) return '';
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+  </script>
+</body>
+</html>

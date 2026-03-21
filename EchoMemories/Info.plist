@@ -61,5 +61,9 @@
 	<string></string>
 	<key>SUPABASE_ANON_KEY</key>
 	<string></string>
+	<key>PUBLIC_SHARE_BASE_URL</key>
+	<string></string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Echo Memories can attach optional photos to your memory entries.</string>
 </dict>
 </plist>

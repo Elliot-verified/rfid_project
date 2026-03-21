@@ -10,6 +10,7 @@ create table if not exists public.garments (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   image_file_name text,
+  is_public boolean not null default false,
   user_id uuid references auth.users(id) on delete cascade
 );
 
@@ -23,6 +24,7 @@ create table if not exists public.journal_entries (
   updated_at timestamptz not null default now(),
   mood text,
   location text,
+  photo_storage_path text,
   user_id uuid references auth.users(id) on delete cascade
 );
 
@@ -39,6 +41,56 @@ create policy "Users can manage own journal_entries"
   on public.journal_entries for all
   using (auth.uid() = user_id)
   with check (auth.uid() = user_id);
+
+-- Public share page / NFC HTTPS URL: anyone may read rows marked public
+create policy "Anyone can read public garments"
+  on public.garments for select
+  to anon, authenticated
+  using (is_public = true);
+
+create policy "Anyone can read entries for public garments"
+  on public.journal_entries for select
+  to anon, authenticated
+  using (
+    exists (
+      select 1 from public.garments g
+      where g.id = journal_entries.garment_id and g.is_public = true
+    )
+  );
+
+-- Storage for memory photos (see migration_public_share_and_photos.sql if bucket already exists)
+insert into storage.buckets (id, name, public)
+values ('entry-photos', 'entry-photos', true)
+on conflict (id) do nothing;
+
+create policy "Users can upload entry photos"
+  on storage.objects for insert
+  to authenticated
+  with check (
+    bucket_id = 'entry-photos'
+    and (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+create policy "Users can update own entry photos"
+  on storage.objects for update
+  to authenticated
+  using (
+    bucket_id = 'entry-photos'
+    and (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+create policy "Users can delete own entry photos"
+  on storage.objects for delete
+  to authenticated
+  using (
+    bucket_id = 'entry-photos'
+    and (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+create policy "Anyone can read entry photos"
+  on storage.objects for select
+  to anon, authenticated
+  using (bucket_id = 'entry-photos');
 
 -- Optional: indexes for common queries
 create index if not exists garments_user_id_idx on public.garments(user_id);

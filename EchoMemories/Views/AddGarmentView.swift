@@ -77,7 +77,7 @@ struct AddGarmentView: View {
         guard !trimmed.isEmpty else { return }
 
         let garment = Garment(name: trimmed)
-        let url = Garment.tagURL(for: garment.id)
+        let url = Garment.nfcWrittenURL(for: garment.id, isPublic: false)
         isWritingTag = true
         writeError = nil
 
