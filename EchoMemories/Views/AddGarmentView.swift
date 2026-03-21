@@ -95,7 +95,7 @@ struct AddGarmentView: View {
                 await MainActor.run {
                     writeError = error.localizedDescription
                     isWritingTag = false
-                    var g = garment
+                    let g = garment
                     store.addGarment(g)
                     didWriteTag = false
                 }
