@@ -37,6 +37,7 @@
 		39DFFAD36855F49C4EC69AC2 /* EditGarmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditGarmentView.swift; sourceTree = "<group>"; };
 		4547DCB9063E1E52619E884F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5AF07B5402D48B2B083238A5 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		65E871E7606DAE9CB2EA79A0 /* App.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = App.xcconfig; sourceTree = "<group>"; };
 		69860BEFEE57AC9C968EB48D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		793E27B0863D088A86FCF0D5 /* GarmentDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GarmentDetailView.swift; sourceTree = "<group>"; };
 		90B0EB24668FEF9C12B7B103 /* SyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncService.swift; sourceTree = "<group>"; };
@@ -80,9 +81,18 @@
 		4CF9A0D720F4849FCB74DF88 = {
 			isa = PBXGroup;
 			children = (
+				5377E856E61D471CD3A02FFE /* Config */,
 				82AB86234104539513DC2106 /* EchoMemories */,
 				A5765DEC5DAAD6DB2B44D921 /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		5377E856E61D471CD3A02FFE /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				65E871E7606DAE9CB2EA79A0 /* App.xcconfig */,
+			);
+			path = Config;
 			sourceTree = "<group>";
 		};
 		82AB86234104539513DC2106 /* EchoMemories */ = {
@@ -233,6 +243,7 @@
 /* Begin XCBuildConfiguration section */
 		5026F8F29569DC4C29E0B51A /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 65E871E7606DAE9CB2EA79A0 /* App.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = EchoMemories/EchoMemories.entitlements;
@@ -376,6 +387,7 @@
 		};
 		DECAC07173998EECDC44A221 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 65E871E7606DAE9CB2EA79A0 /* App.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = EchoMemories/EchoMemories.entitlements;

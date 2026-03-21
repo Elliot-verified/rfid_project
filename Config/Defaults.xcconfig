@@ -1,0 +1,4 @@
+// Fallback when Config/Secrets.xcconfig is absent (e.g. fresh clone).
+SUPABASE_URL =
+SUPABASE_ANON_KEY =
+PUBLIC_SHARE_BASE_URL =

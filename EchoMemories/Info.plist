@@ -28,7 +28,6 @@
 	<dict/>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
-		<string>nfc</string>
 		<string>armv7</string>
 	</array>
 	<key>UISupportedInterfaceOrientations</key>
@@ -58,11 +57,11 @@
 		</dict>
 	</array>
 	<key>SUPABASE_URL</key>
-	<string></string>
+	<string>$(SUPABASE_URL)</string>
 	<key>SUPABASE_ANON_KEY</key>
-	<string></string>
+	<string>$(SUPABASE_ANON_KEY)</string>
 	<key>PUBLIC_SHARE_BASE_URL</key>
-	<string></string>
+	<string>$(PUBLIC_SHARE_BASE_URL)</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Echo Memories can attach optional photos to your memory entries.</string>
 </dict>

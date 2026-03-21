@@ -79,12 +79,29 @@ To back up and sync data across devices:
 
 3. In Supabase: **Auth → Providers → Apple**, enable Sign in with Apple and set your app’s Bundle ID and Key.
 
-4. In Xcode, add your project URL and anon key to **Info.plist**:
-   - `SUPABASE_URL`: your project URL (e.g. `https://xxxx.supabase.co`)
-   - `SUPABASE_ANON_KEY`: the anon/public key from Project Settings → API
-   - `PUBLIC_SHARE_BASE_URL` (optional): where you host [web/share.html](web/share.html), **no trailing slash** (e.g. `https://yourname.github.io/echo-memories`). Required only if you want **public** NFC links that open in a browser for anyone.
+4. **Configure Supabase keys (not committed to git):**
+   - Copy [Config/Secrets.xcconfig.example](Config/Secrets.xcconfig.example) to `Config/Secrets.xcconfig` (this path is in `.gitignore`).
+   - Fill in:
+     - `SUPABASE_URL` — project URL (e.g. `https://xxxx.supabase.co`)
+     - `SUPABASE_ANON_KEY` — anon/public key from **Project Settings → API**
+     - `PUBLIC_SHARE_BASE_URL` (optional) — where you host [web/share.html](web/share.html), **no trailing slash**. Needed only for **public** NFC links in the browser.
+
+   The target uses [Config/App.xcconfig](Config/App.xcconfig), which merges [Config/Defaults.xcconfig](Config/Defaults.xcconfig) with optional `Secrets.xcconfig` and injects values into **Info.plist** at build time.
 
 5. In the app, open **Settings**, tap **Sign in with Apple**, then **Sync now**.
+
+### TestFlight / Xcode Cloud
+
+Archive uploads do not include `Secrets.xcconfig` (it stays local). To enable Supabase, Sign in with Apple, and **photo uploads** on builds from **Xcode Cloud**:
+
+1. In [App Store Connect](https://appstoreconnect.apple.com) → your app → **Xcode Cloud** → **Manage Workflows** → edit the workflow → **Environment** → **Environment variables**, add:
+   - `SUPABASE_URL` — your Supabase project URL (mark as **Secret** if offered)
+   - `SUPABASE_ANON_KEY` — anon key (**Secret**)
+   - `PUBLIC_SHARE_BASE_URL` — optional; same as above
+
+2. The repo includes [ci_scripts/ci_post_clone.sh](ci_scripts/ci_post_clone.sh). Xcode Cloud runs it after clone; it writes `Config/Secrets.xcconfig` from those variables before the build.
+
+3. Trigger a new build. Then **Sign in with Apple** on device; **Add memory** → **Photo** should show **Add photo**.
 
 ### Public page (anyone can scan)
 

@@ -1,0 +1,7 @@
+# Local Supabase / share URL (see Config/Secrets.xcconfig.example)
+Config/Secrets.xcconfig
+
+# Xcode
+DerivedData/
+*.xcuserstate
+xcuserdata/

@@ -16,6 +16,9 @@ packages:
     from: "2.0.0"
 targets:
   EchoMemories:
+    configFiles:
+      Debug: Config/App.xcconfig
+      Release: Config/App.xcconfig
     dependencies:
       - package: supabase-swift
         product: Supabase
@@ -36,6 +39,6 @@ targets:
       path: EchoMemories/EchoMemories.entitlements
       properties:
         com.apple.developer.nfc.readersession.formats:
-          - NDEF
+          - TAG
         com.apple.developer.applesignin:
           - Default
