@@ -1,0 +1,41 @@
+name: EchoMemories
+options:
+  bundleIdPrefix: com.echomemories
+  deploymentTarget:
+    iOS: "16.0"
+  xcodeVersion: "15.0"
+  generateEmptyDirectories: true
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    TARGETED_DEVICE_FAMILY: "1,2"
+    DEVELOPMENT_TEAM: L7QZWYH65L
+packages:
+  supabase-swift:
+    url: https://github.com/supabase/supabase-swift
+    from: "2.0.0"
+targets:
+  EchoMemories:
+    dependencies:
+      - package: supabase-swift
+        product: Supabase
+    type: application
+    platform: iOS
+    deploymentTarget: "16.0"
+    sources:
+      - path: EchoMemories
+        name: EchoMemories
+    settings:
+      base:
+        INFOPLIST_FILE: EchoMemories/Info.plist
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ENABLE_PREVIEWS: YES
+        CODE_SIGN_STYLE: Automatic
+        TARGETED_DEVICE_FAMILY: "1,2"
+    entitlements:
+      path: EchoMemories/EchoMemories.entitlements
+      properties:
+        com.apple.developer.nfc.readersession.formats:
+          - NDEF
+        com.apple.developer.applesignin:
+          - Default
