@@ -4,11 +4,31 @@ struct SettingsView: View {
     @EnvironmentObject var syncService: SyncService
     @StateObject private var authService = AuthService.shared
 
+    /// What’s embedded at build time (safe: no keys printed). Use to verify TestFlight / Xcode Cloud.
+    private var diagnosticsRows: [(label: String, value: String)] {
+        let url = (Bundle.main.object(forInfoDictionaryKey: "SUPABASE_URL") as? String)?
+            .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let key = (Bundle.main.object(forInfoDictionaryKey: "SUPABASE_ANON_KEY") as? String)?
+            .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let share = (Bundle.main.object(forInfoDictionaryKey: "PUBLIC_SHARE_BASE_URL") as? String)?
+            .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let ver = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
+        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "?"
+        return [
+            ("App version", "\(ver) (\(build))"),
+            ("SUPABASE_URL", url.isEmpty ? "empty" : "set"),
+            ("SUPABASE_ANON_KEY", key.isEmpty ? "empty" : "set"),
+            ("PUBLIC_SHARE_BASE_URL", share.isEmpty ? "empty" : "set"),
+            ("Supabase client", SupabaseClientManager.isConfigured ? "ready" : "not configured"),
+            ("Auth session", authService.session != nil ? "signed in" : "not signed in"),
+        ]
+    }
+
     var body: some View {
         Form {
             if SupabaseClientManager.isConfigured {
                 Section {
-                    if let session = authService.session {
+                    if authService.session != nil {
                         Text("Signed in")
                             .foregroundStyle(.secondary)
                         Button("Sign out", role: .destructive) {
@@ -58,14 +78,32 @@ struct SettingsView: View {
                 }
             } else {
                 Section {
-                    Label("Sync coming soon", systemImage: "icloud")
+                    Label("Cloud backup unavailable in this build", systemImage: "icloud")
                         .foregroundStyle(.secondary)
-                    Text("Add SUPABASE_URL and SUPABASE_ANON_KEY to Info.plist for cloud backup.")
+                    Text("This install was built without Supabase URL and anon key. For TestFlight from Xcode Cloud, add SUPABASE_URL and SUPABASE_ANON_KEY as workflow environment variables (see README). For local Archive, keep Config/Secrets.xcconfig on the Mac you archive from.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 } header: {
                     Text("Sync")
                 }
+            }
+
+            Section {
+                ForEach(diagnosticsRows, id: \.label) { row in
+                    HStack(alignment: .firstTextBaseline) {
+                        Text(row.label)
+                        Spacer(minLength: 8)
+                        Text(row.value)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.trailing)
+                    }
+                    .font(.footnote)
+                }
+            } header: {
+                Text("Diagnostics")
+            } footer: {
+                Text("Shows whether keys are present in this build (not their values). Photos need URL + key set, Supabase client ready, and signed in.")
+                    .font(.caption2)
             }
         }
         .navigationTitle("Settings")
