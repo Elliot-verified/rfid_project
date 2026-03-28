@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F1E2D3C4B5A6978890A1B2C33 /* AppBuildSecrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1E2D3C4B5A6978890A1B2C32 /* AppBuildSecrets.swift */; };
+		F1E2D3C4B5A6978890A1B2C35 /* GeneratedSupabaseConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1E2D3C4B5A6978890A1B2C34 /* GeneratedSupabaseConfig.swift */; };
 		3C14E1E9F9E834EFAB8B5C6D /* EntryPhotoUpload.swift in Sources */ = {isa = PBXBuildFile; fileRef = B130ACA12817942657AB90BA /* EntryPhotoUpload.swift */; };
 		571F6BCE6070F5669E2DD8FA /* GarmentListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 118DF04CF7B4F71E765F5E32 /* GarmentListView.swift */; };
 		581102145FA1BAC595288BED /* NFCService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B58DD8A5DDFD96682E640289 /* NFCService.swift */; };
@@ -38,6 +40,8 @@
 		4547DCB9063E1E52619E884F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5AF07B5402D48B2B083238A5 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		65E871E7606DAE9CB2EA79A0 /* App.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = App.xcconfig; sourceTree = "<group>"; };
+		F1E2D3C4B5A6978890A1B2C32 /* AppBuildSecrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppBuildSecrets.swift; sourceTree = "<group>"; };
+		F1E2D3C4B5A6978890A1B2C34 /* GeneratedSupabaseConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneratedSupabaseConfig.swift; sourceTree = "<group>"; };
 		69860BEFEE57AC9C968EB48D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		793E27B0863D088A86FCF0D5 /* GarmentDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GarmentDetailView.swift; sourceTree = "<group>"; };
 		90B0EB24668FEF9C12B7B103 /* SyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncService.swift; sourceTree = "<group>"; };
@@ -98,10 +102,12 @@
 		82AB86234104539513DC2106 /* EchoMemories */ = {
 			isa = PBXGroup;
 			children = (
+				F1E2D3C4B5A6978890A1B2C32 /* AppBuildSecrets.swift */,
 				4547DCB9063E1E52619E884F /* Assets.xcassets */,
 				5AF07B5402D48B2B083238A5 /* ContentView.swift */,
 				EE58BD3F633B67F948759446 /* EchoMemories.entitlements */,
 				0A63426137BF961B93461DD8 /* EchoMemoriesApp.swift */,
+				F1E2D3C4B5A6978890A1B2C34 /* GeneratedSupabaseConfig.swift */,
 				69860BEFEE57AC9C968EB48D /* Info.plist */,
 				B4DE71EA62E6436D1081E6A7 /* Models */,
 				93D9D084550E937F4C7C0EEA /* Services */,
@@ -148,6 +154,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 65E3B3D510023925C1C77D09 /* Build configuration list for PBXNativeTarget "EchoMemories" */;
 			buildPhases = (
+				F1E2D3C4B5A6978890A1B2C31 /* Write GeneratedSupabaseConfig */,
 				226C010D70CFB2ACB0B72973 /* Sources */,
 				A71EB32DC9A1D5C82276142D /* Resources */,
 				24A152282B35ED05AC00F8F7 /* Frameworks */,
@@ -200,6 +207,29 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		F1E2D3C4B5A6978890A1B2C31 /* Write GeneratedSupabaseConfig */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Write GeneratedSupabaseConfig";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(SRCROOT)/EchoMemories/GeneratedSupabaseConfig.swift",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "cd \"${SRCROOT}\" && bash \"${SRCROOT}/ci_scripts/write_generated_supabase_swift.sh\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXResourcesBuildPhase section */
 		A71EB32DC9A1D5C82276142D /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
@@ -216,6 +246,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F1E2D3C4B5A6978890A1B2C33 /* AppBuildSecrets.swift in Sources */,
+				F1E2D3C4B5A6978890A1B2C35 /* GeneratedSupabaseConfig.swift in Sources */,
 				FA5A59048983FFFECAF7EEEE /* AddGarmentView.swift in Sources */,
 				74986A0303F99E818F4ACA07 /* AppState.swift in Sources */,
 				7CC2A43AEABC2ECF7B0D0C55 /* AuthService.swift in Sources */,

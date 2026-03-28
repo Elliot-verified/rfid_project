@@ -45,3 +45,6 @@ escape_for_xcconfig_string() {
 } > "$CONFIG_DIR/Secrets.xcconfig"
 
 echo "Wrote Config/Secrets.xcconfig from Xcode Cloud environment variables."
+
+# Also embed into Swift so TestFlight does not rely on Info.plist $(VAR) expansion from xcconfig.
+bash "$ROOT/ci_scripts/write_generated_supabase_swift.sh"

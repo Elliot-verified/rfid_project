@@ -68,9 +68,8 @@ struct Garment: Identifiable, Codable, Equatable {
 
     /// URL to write to the tag: public HTTPS share page when `isPublic` and `PUBLIC_SHARE_BASE_URL` are set; otherwise app deep link.
     static func nfcWrittenURL(for garmentId: UUID, isPublic: Bool) -> String {
-        if isPublic,
-           let base = Bundle.main.object(forInfoDictionaryKey: "PUBLIC_SHARE_BASE_URL") as? String {
-            let trimmed = base.trimmingCharacters(in: .whitespacesAndNewlines)
+        if isPublic {
+            let trimmed = AppBuildSecrets.publicShareBaseURLString
             guard !trimmed.isEmpty else { return appDeepLink(for: garmentId) }
             let noSlash = trimmed.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
             return "\(noSlash)/share.html?id=\(garmentId.uuidString)"

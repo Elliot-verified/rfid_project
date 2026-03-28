@@ -99,7 +99,7 @@ Archive uploads do not include `Secrets.xcconfig` (it stays local). To enable Su
    - `SUPABASE_ANON_KEY` — anon key (**Secret**)
    - `PUBLIC_SHARE_BASE_URL` — optional; same as above
 
-2. The repo includes [ci_scripts/ci_post_clone.sh](ci_scripts/ci_post_clone.sh). Xcode Cloud runs it after clone; it writes `Config/Secrets.xcconfig` from those variables before the build.
+2. The repo includes [ci_scripts/ci_post_clone.sh](ci_scripts/ci_post_clone.sh) (runs after clone) and a **Run Script** build phase that runs [ci_scripts/write_generated_supabase_swift.sh](ci_scripts/write_generated_supabase_swift.sh). Together they inject workflow env vars into `Config/Secrets.xcconfig` and into `EchoMemories/GeneratedSupabaseConfig.swift` (base64). The Swift embed avoids TestFlight failures where Info.plist never expands `$(SUPABASE_URL)` from xcconfig.
 
 3. Trigger a new build. Then **Sign in with Apple** on device; **Add memory** → **Photo** should show **Add photo**.
 

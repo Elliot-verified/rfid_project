@@ -1,7 +1,7 @@
 import Foundation
 import Supabase
 
-/// Provides a configured Supabase client when SUPABASE_URL and SUPABASE_ANON_KEY are set in Info.plist.
+/// Provides a configured Supabase client when URL + anon key are set (see `AppBuildSecrets`).
 enum SupabaseClientManager {
     static let jsonDecoder: JSONDecoder = {
         let d = JSONDecoder()
@@ -27,13 +27,17 @@ enum SupabaseClientManager {
     }()
 
     static var client: SupabaseClient? {
-        guard let rawURL = Bundle.main.object(forInfoDictionaryKey: "SUPABASE_URL") as? String,
-              let rawKey = Bundle.main.object(forInfoDictionaryKey: "SUPABASE_ANON_KEY") as? String else { return nil }
-        let urlString = rawURL.trimmingCharacters(in: .whitespacesAndNewlines)
-        let key = rawKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        let urlString = AppBuildSecrets.supabaseURLString
+        let key = AppBuildSecrets.supabaseAnonKey
         guard !urlString.isEmpty,
               !key.isEmpty,
-              let url = URL(string: urlString) else { return nil }
+              !urlString.contains("$("),
+              !key.contains("$("),
+              let url = URL(string: urlString),
+              let scheme = url.scheme?.lowercased(),
+              scheme == "https" || scheme == "http",
+              let host = url.host,
+              !host.isEmpty else { return nil }
         let options = SupabaseClientOptions(
             db: .init(encoder: jsonEncoder, decoder: jsonDecoder)
         )
@@ -44,8 +48,7 @@ enum SupabaseClientManager {
 
     /// Public object URL for Storage (bucket must be public or use signed URLs elsewhere).
     static func publicStorageObjectURL(bucket: String, objectPath: String) -> URL? {
-        guard let raw = Bundle.main.object(forInfoDictionaryKey: "SUPABASE_URL") as? String else { return nil }
-        let urlString = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        let urlString = AppBuildSecrets.supabaseURLString
         guard !urlString.isEmpty else { return nil }
         let base = urlString.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
         let encodedPath = objectPath.split(separator: "/").map { $0.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? String($0) }.joined(separator: "/")

@@ -6,12 +6,11 @@ struct SettingsView: View {
 
     /// What’s embedded at build time (safe: no keys printed). Use to verify TestFlight / Xcode Cloud.
     private var diagnosticsRows: [(label: String, value: String)] {
-        let rawURL = Bundle.main.object(forInfoDictionaryKey: "SUPABASE_URL") as? String ?? ""
-        let rawKey = Bundle.main.object(forInfoDictionaryKey: "SUPABASE_ANON_KEY") as? String ?? ""
-        let url = rawURL.trimmingCharacters(in: .whitespacesAndNewlines)
-        let key = rawKey.trimmingCharacters(in: .whitespacesAndNewlines)
-        let share = (Bundle.main.object(forInfoDictionaryKey: "PUBLIC_SHARE_BASE_URL") as? String)?
-            .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let rawURL = AppBuildSecrets.supabaseURLString
+        let rawKey = AppBuildSecrets.supabaseAnonKey
+        let url = rawURL
+        let key = rawKey
+        let share = AppBuildSecrets.publicShareBaseURLString
         let ver = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "?"
         let urlParses = URL(string: url) != nil
