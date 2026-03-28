@@ -25,6 +25,11 @@ struct SettingsView: View {
         ]
         if looksUnexpanded {
             rows.append(("Plist substitution", "looks unexpanded (see $() in bundle)"))
+        } else if !url.isEmpty, !urlParses {
+            rows.append((
+                "SUPABASE_URL hint",
+                "Bundle value is not a valid URL (stale Secrets, bad paste, or missing xcconfig). Xcode Cloud: ensure workflow env vars and latest ci_post_clone.sh."
+            ))
         }
         rows.append(contentsOf: [
             ("Supabase client", SupabaseClientManager.isConfigured ? "ready" : "not configured"),
