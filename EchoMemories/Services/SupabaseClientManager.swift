@@ -27,9 +27,11 @@ enum SupabaseClientManager {
     }()
 
     static var client: SupabaseClient? {
-        guard let urlString = Bundle.main.object(forInfoDictionaryKey: "SUPABASE_URL") as? String,
-              !urlString.isEmpty,
-              let key = Bundle.main.object(forInfoDictionaryKey: "SUPABASE_ANON_KEY") as? String,
+        guard let rawURL = Bundle.main.object(forInfoDictionaryKey: "SUPABASE_URL") as? String,
+              let rawKey = Bundle.main.object(forInfoDictionaryKey: "SUPABASE_ANON_KEY") as? String else { return nil }
+        let urlString = rawURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        let key = rawKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !urlString.isEmpty,
               !key.isEmpty,
               let url = URL(string: urlString) else { return nil }
         let options = SupabaseClientOptions(
@@ -42,8 +44,9 @@ enum SupabaseClientManager {
 
     /// Public object URL for Storage (bucket must be public or use signed URLs elsewhere).
     static func publicStorageObjectURL(bucket: String, objectPath: String) -> URL? {
-        guard let urlString = Bundle.main.object(forInfoDictionaryKey: "SUPABASE_URL") as? String,
-              !urlString.isEmpty else { return nil }
+        guard let raw = Bundle.main.object(forInfoDictionaryKey: "SUPABASE_URL") as? String else { return nil }
+        let urlString = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !urlString.isEmpty else { return nil }
         let base = urlString.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
         let encodedPath = objectPath.split(separator: "/").map { $0.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? String($0) }.joined(separator: "/")
         return URL(string: "\(base)/storage/v1/object/public/\(bucket)/\(encodedPath)")

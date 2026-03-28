@@ -6,22 +6,31 @@ struct SettingsView: View {
 
     /// What’s embedded at build time (safe: no keys printed). Use to verify TestFlight / Xcode Cloud.
     private var diagnosticsRows: [(label: String, value: String)] {
-        let url = (Bundle.main.object(forInfoDictionaryKey: "SUPABASE_URL") as? String)?
-            .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        let key = (Bundle.main.object(forInfoDictionaryKey: "SUPABASE_ANON_KEY") as? String)?
-            .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let rawURL = Bundle.main.object(forInfoDictionaryKey: "SUPABASE_URL") as? String ?? ""
+        let rawKey = Bundle.main.object(forInfoDictionaryKey: "SUPABASE_ANON_KEY") as? String ?? ""
+        let url = rawURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        let key = rawKey.trimmingCharacters(in: .whitespacesAndNewlines)
         let share = (Bundle.main.object(forInfoDictionaryKey: "PUBLIC_SHARE_BASE_URL") as? String)?
             .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         let ver = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "?"
-        return [
+        let urlParses = URL(string: url) != nil
+        let looksUnexpanded = url.contains("$(") || key.contains("$(") || rawURL.contains("${") || rawKey.contains("${")
+        var rows: [(String, String)] = [
             ("App version", "\(ver) (\(build))"),
             ("SUPABASE_URL", url.isEmpty ? "empty" : "set"),
             ("SUPABASE_ANON_KEY", key.isEmpty ? "empty" : "set"),
             ("PUBLIC_SHARE_BASE_URL", share.isEmpty ? "empty" : "set"),
+            ("SUPABASE_URL parses as URL", urlParses ? "yes" : "no"),
+        ]
+        if looksUnexpanded {
+            rows.append(("Plist substitution", "looks unexpanded (see $() in bundle)"))
+        }
+        rows.append(contentsOf: [
             ("Supabase client", SupabaseClientManager.isConfigured ? "ready" : "not configured"),
             ("Auth session", authService.session != nil ? "signed in" : "not signed in"),
-        ]
+        ])
+        return rows
     }
 
     var body: some View {
@@ -102,7 +111,7 @@ struct SettingsView: View {
             } header: {
                 Text("Diagnostics")
             } footer: {
-                Text("Shows whether keys are present in this build (not their values). Photos need URL + key set, Supabase client ready, and signed in.")
+                Text("If URL/key show “set” but “parses as URL” is no, or Plist substitution appears, the build did not expand $(…) from xcconfig—fix target Config or Cloud secrets. Photos need client ready and signed in.")
                     .font(.caption2)
             }
         }
