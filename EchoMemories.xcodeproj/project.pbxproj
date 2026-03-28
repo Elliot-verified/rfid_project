@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 63;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -33,7 +33,7 @@
 		118DF04CF7B4F71E765F5E32 /* GarmentListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GarmentListView.swift; sourceTree = "<group>"; };
 		14B074FC7479121BEEA759DA /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
 		2269E0AAFB42B55CB79B82CC /* Garment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Garment.swift; sourceTree = "<group>"; };
-		28773A0AD91D67B5AF03E6AB /* EchoMemories.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = EchoMemories.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		28773A0AD91D67B5AF03E6AB /* EchoMemories.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EchoMemories.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		39DFFAD36855F49C4EC69AC2 /* EditGarmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditGarmentView.swift; sourceTree = "<group>"; };
 		4547DCB9063E1E52619E884F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5AF07B5402D48B2B083238A5 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -107,7 +107,6 @@
 				93D9D084550E937F4C7C0EEA /* Services */,
 				385EA6C32C87251F0303EB2F /* Views */,
 			);
-			name = EchoMemories;
 			path = EchoMemories;
 			sourceTree = "<group>";
 		};
@@ -193,7 +192,6 @@
 			packageReferences = (
 				07B3B3B48A27C0C78AF2806B /* XCRemoteSwiftPackageReference "supabase-swift" */,
 			);
-			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
